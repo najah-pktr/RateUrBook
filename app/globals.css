@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #050507;
+    color: #f4f4f5;
+    font-family: 'Google Sans', sans-serif;
+  }
+}
