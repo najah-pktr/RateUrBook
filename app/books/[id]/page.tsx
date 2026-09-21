@@ -223,7 +223,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
             <div>
               <div className="font-mono text-xs text-zinc-400 mb-6 pb-2 border-b border-zinc-900 flex justify-between">
                 <span>SHELF LOCATION: {book.shelf}</span>
-                <span>STATUS: AVAILABLE</span>
+                <span>RATEURBOOK DISCUSSIONS</span>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white mb-4 leading-tight">
