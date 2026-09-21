@@ -11,8 +11,8 @@ interface Book {
   author: string;
   avgRating?: number;
   reviewCount?: number;
-  genre?: string;           // Raw string from DB
-  suggestedGenres?: string[]; // Parsed array for UI
+  genre?: string;
+  suggestedGenres?: string[];
 }
 
 export default function Home() {
@@ -36,17 +36,26 @@ export default function Home() {
       const res = await fetch(`/api/books?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       if (data.books) {
-        // Parse raw genre strings into clean arrays so everything parses correctly
+        // Bulletproof parser: handles strings, arrays, and comma-separated blobs anywhere they appear
         const parsedBooks = data.books.map((book: Book) => {
-          let parsedGenres: string[] = [];
-          if (book.suggestedGenres && Array.isArray(book.suggestedGenres)) {
-            parsedGenres = book.suggestedGenres;
-          } else if (book.genre) {
-            parsedGenres = book.genre.split(',').map((g) => g.trim()).filter(Boolean);
+          const rawSource = book.suggestedGenres || book.genre || [];
+          let flatArray: string[] = [];
+
+          if (Array.isArray(rawSource)) {
+            flatArray = rawSource.flatMap((item) => 
+              typeof item === 'string' ? item.split(',') : [item]
+            );
+          } else if (typeof rawSource === 'string') {
+            flatArray = rawSource.split(',');
           }
+
+          const cleanGenres = Array.from(
+            new Set(flatArray.map((g) => String(g).trim()).filter(Boolean))
+          );
+
           return {
             ...book,
-            suggestedGenres: parsedGenres,
+            suggestedGenres: cleanGenres,
           };
         });
         setBooks(parsedBooks);
@@ -69,10 +78,10 @@ export default function Home() {
     localStorage.removeItem('granthagram_current_user');
   };
 
-  // Safely extract and normalize all unique genres across books
+  // Extract all unique genres across books for the dropdown
   const allGenres = Array.from(
     new Set(books.flatMap((b) => b.suggestedGenres || []))
-  ).map(g => g.toLowerCase()).filter(Boolean);
+  ).map((g) => g.toLowerCase()).filter(Boolean);
 
   // Extract unique shelves
   const allShelves = Array.from(
@@ -259,7 +268,7 @@ export default function Home() {
                       </p>
                     )}
 
-                    {/* Genres Tag Box */}
+                    {/* Clean Individual Genre Pills */}
                     {book.suggestedGenres && book.suggestedGenres.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mb-6">
                         {book.suggestedGenres.map((g, idx) => (
