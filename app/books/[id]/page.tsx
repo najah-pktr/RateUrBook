@@ -31,6 +31,15 @@ interface Book {
   suggestedGenres?: string[];
 }
 
+// Utility function to split comma-separated genres and clean them up
+const parseGenres = (genreString?: string): string[] => {
+  if (!genreString) return [];
+  return genreString
+    .split(',')
+    .map((g) => g.trim().toUpperCase())
+    .filter((g) => g.length > 0);
+};
+
 function timeAgo(dateString?: string) {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -245,11 +254,12 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                 </p>
               </div>
 
+              {/* Aggregated Suggested Genres with Comma Splitting */}
               <div className="border border-zinc-800 p-4 bg-zinc-950">
                 <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">STUDENT SUGGESTED GENRES</p>
                 {book.suggestedGenres && book.suggestedGenres.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {book.suggestedGenres.map((g, i) => (
+                    {book.suggestedGenres.flatMap((g) => parseGenres(g)).map((g, i) => (
                       <span key={i} className="font-mono text-xs uppercase bg-black border border-zinc-800 px-2.5 py-1 text-white">
                         {g}
                       </span>
@@ -262,7 +272,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
             </div>
 
             <div className="mt-8 pt-4 border-t border-zinc-900 font-mono text-[10px] text-zinc-600 uppercase">
-              GRANTHAGRAM DIGITAL ARCHIVE SYSTEM
+              RATEURBOOK DIGITAL ARCHIVE SYSTEM
             </div>
           </div>
 
@@ -272,7 +282,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                 SUBMIT STUDENT REVIEW
               </h2>
               <p className="font-mono text-xs text-zinc-400 mb-6">
-                Help fellow students discover this book. Write honest feedback and suggest genres.
+                Help fellow students discover this book. Write honest feedback and suggest genres (comma separated).
               </p>
 
               {!currentUser ? (
@@ -325,13 +335,13 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
 
                   <div>
                     <label className="block font-mono text-[10px] text-zinc-400 uppercase mb-2">
-                      SUGGEST A GENRE (E.G. FICTION, HISTORY, POETRY)
+                      SUGGEST GENRES (SEPARATED BY COMMAS, E.G. POETRY, LOVE, THRILLER)
                     </label>
                     <input
                       type="text"
                       value={genreInput}
                       onChange={(e) => setGenreInput(e.target.value)}
-                      placeholder="E.G. SCIENCE FICTION, CLASSIC"
+                      placeholder="E.G. POETRY, ROMANCE, SHORT READ"
                       className="w-full bg-black border border-zinc-800 p-3 text-white font-mono text-xs focus:outline-none focus:border-white uppercase placeholder-zinc-700"
                     />
                   </div>
@@ -378,11 +388,14 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                           {rev.content}
                         </p>
 
+                        {/* Individual Review Genre Tags Parsed from Commas */}
                         {rev.genre && (
-                          <div className="mb-4">
-                            <span className="inline-block font-mono text-[9px] uppercase border border-zinc-800 px-2 py-0.5 text-zinc-400">
-                              SUGGESTED GENRE: {rev.genre}
-                            </span>
+                          <div className="mb-4 flex flex-wrap gap-1.5">
+                            {parseGenres(rev.genre).map((g, i) => (
+                              <span key={i} className="inline-block font-mono text-[9px] uppercase border border-zinc-800 px-2 py-0.5 text-zinc-400">
+                                {g}
+                              </span>
+                            ))}
                           </div>
                         )}
 
