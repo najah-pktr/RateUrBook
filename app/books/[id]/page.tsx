@@ -329,7 +329,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="WHAT DID YOU THINK OF THIS BOOK?"
-                      className="w-full bg-black border border-zinc-800 p-3 text-white font-mono text-xs focus:outline-none focus:border-white uppercase placeholder-zinc-700"
+                      className="w-full bg-black border border-zinc-800 p-3 text-white font-mono text-xs focus:outline-none focus:border-white placeholder-zinc-700"
                     />
                   </div>
 
@@ -424,7 +424,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                                 placeholder="WRITE A REPLY..."
                                 value={replyInputs[reviewId] || ''}
                                 onChange={(e) => setReplyInputs({ ...replyInputs, [reviewId]: e.target.value })}
-                                className="flex-1 bg-black border border-zinc-800 px-3 py-2 text-white font-mono text-[11px] uppercase placeholder-zinc-700 focus:outline-none focus:border-white"
+                                className="flex-1 bg-black border border-zinc-800 px-3 py-2 text-white font-mono text-[11px] placeholder-zinc-700 focus:outline-none focus:border-white"
                               />
                               <button
                                 type="submit"
