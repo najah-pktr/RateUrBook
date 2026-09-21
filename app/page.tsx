@@ -11,7 +11,8 @@ interface Book {
   author: string;
   avgRating?: number;
   reviewCount?: number;
-  suggestedGenres?: string[];
+  genre?: string;           // Raw string from DB
+  suggestedGenres?: string[]; // Parsed array for UI
 }
 
 export default function Home() {
@@ -35,7 +36,20 @@ export default function Home() {
       const res = await fetch(`/api/books?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       if (data.books) {
-        setBooks(data.books);
+        // Parse raw genre strings into clean arrays so everything parses correctly
+        const parsedBooks = data.books.map((book: Book) => {
+          let parsedGenres: string[] = [];
+          if (book.suggestedGenres && Array.isArray(book.suggestedGenres)) {
+            parsedGenres = book.suggestedGenres;
+          } else if (book.genre) {
+            parsedGenres = book.genre.split(',').map((g) => g.trim()).filter(Boolean);
+          }
+          return {
+            ...book,
+            suggestedGenres: parsedGenres,
+          };
+        });
+        setBooks(parsedBooks);
       }
     } catch (e) {
       console.error(e);
@@ -55,10 +69,10 @@ export default function Home() {
     localStorage.removeItem('granthagram_current_user');
   };
 
-  // Extract all unique genres across books
+  // Safely extract and normalize all unique genres across books
   const allGenres = Array.from(
     new Set(books.flatMap((b) => b.suggestedGenres || []))
-  ).filter(Boolean);
+  ).map(g => g.toLowerCase()).filter(Boolean);
 
   // Extract unique shelves
   const allShelves = Array.from(
